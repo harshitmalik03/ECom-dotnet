@@ -31,9 +31,9 @@
                         <li class="nav-item">
                             <a class="nav-link "asp-area="Customer"  asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        
+                     @*    
                         @if (User.IsInRole(SD.Role_Admin))
-                        {
+                        { *@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Content Management
@@ -50,7 +50,13 @@
 
                                 </ul>
                             </li>
-                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Customer" asp-controller="Cart" asp-action="Index">
+                                <i class="bi bi-cart"></i> &nbsp;
+                            </a>
+                        </li>
+                        @* } *@
                     </ul>
                     <partial name="_LoginPartial"/>
                 </div>
@@ -72,6 +78,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="//cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js" asp-append-version="true"></script>
     <script src="https://cdn.tiny.cloud/1/r7ozc5wou9eupnij0ryvhelk09xy48yvxtqh9wegqytv7k9o/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     @await RenderSectionAsync("Scripts", required: false)

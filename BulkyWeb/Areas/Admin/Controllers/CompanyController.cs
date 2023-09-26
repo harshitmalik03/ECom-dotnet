@@ -1,0 +1,146 @@
+﻿
+using Bulky.DataAccess.Data;
+using Bulky.DataAccess.Repository.IRepository;
+using Bulky.Model;
+using Bulky.Model.ViewModels;
+using Bulky.Utility;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace BulkyWeb.Areas.Admin.Controllers
+{
+    [Area("Admin")]
+
+    //[Authorize(Roles = SD.Role_Admin)]
+    public class CompanyController : Controller
+    {
+       
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public CompanyController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public IActionResult Index()
+        {
+            List<Company> objCategoryList = _unitOfWork.Company.GetAll(includeProperties : "Category").ToList();
+           
+            return View(objCategoryList);
+        }
+
+        //creating a new controller for Create new category
+        //public IActionResult Create()
+        //{
+        //    // before sending the list of Companys to the view I want to first retrieve the data of category from the database and the send it to the view.
+        //    //In order to retrieve the data from database dynamically we will make use of Projections concept of EF Core
+        //    IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category
+        //        .GetAll().Select(u => new SelectListItem
+        //        {
+        //            Text = u.Name,
+        //            Value = u.Id.ToString()
+        //        });
+        //    //Inorder to transfer this category data retrieved to the view we will use ViewBag(which is used to transer data from controller to the view and it will have a key value pair)
+        //    //ViewBag.CategoryList = CategoryList;
+
+
+        //    //Another way of sending this data to the view is using ViewData
+        //    ViewData["CategoryList"]= CategoryList;
+        //    return View();
+        //}
+
+        public IActionResult Upsert(int? id)
+        {
+            
+            if(id==null || id == 0)
+            {
+                // that means it is create
+                return View(new Company());
+            }
+            else
+            {
+                //update functionality
+                Company companyobj = _unitOfWork.Company.Get(u => u.Id == id);
+                return View(companyobj);
+            }
+            
+        }
+
+        // adding a new category by user onto our database 
+        [HttpPost]
+        public IActionResult Upsert(Company companyObj)
+        {
+           
+
+            if (ModelState.IsValid)
+            {
+                
+                if(companyObj.Id==0) // createcwali functinality
+                {
+                    _unitOfWork.Company.Add(companyObj); //addiing the new Comapany to the databse
+
+                }
+                else// update wali functionality
+                {
+                    _unitOfWork.Company.Update(companyObj);
+                }
+                _unitOfWork.Save(); // saving the new changes onto the db
+                TempData["success"] = "Category created successfully";
+                return RedirectToAction("Index"); //redirecting to the Index action of the controller Category
+            }
+            else// if our ModelState is not not valid then while returning we need to populate the dropdown once again
+            {
+                
+                return View(companyObj);
+                    
+            };
+            
+           
+
+        }
+        // Action method for Delete
+       
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePOST(int? id)
+        {
+            Company? obj = _unitOfWork.Company.Get(u => u.Id == id);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            _unitOfWork.Company.Remove(obj);
+            _unitOfWork.Save();
+            TempData["success"] = "Category deleted successfully";
+            return RedirectToAction("Index");
+
+
+        }
+
+        #region API CALLS
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Company> objCategoryList = _unitOfWork.Company.GetAll().ToList();
+            return Json(new { data = objCategoryList });
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            var CompanyToBeDeleted = _unitOfWork.Company.Get(u => u.Id == id);
+            if (CompanyToBeDeleted == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+
+            _unitOfWork.Company.Remove(CompanyToBeDeleted);
+            _unitOfWork.Save();
+
+            return Json(new { success = true, message = "Delete Successful" });
+        }
+
+        #endregion
+    }
+}
