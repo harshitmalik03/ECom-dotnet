@@ -32,11 +32,11 @@ namespace Bulky.DataAccess.Repository
 
         public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-
             IQueryable<T> query;
             if (tracked)
             {
                 query = dbSet;
+
             }
             else
             {
@@ -44,7 +44,6 @@ namespace Bulky.DataAccess.Repository
             }
 
             query = query.Where(filter);
-
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProp in includeProperties
@@ -53,7 +52,6 @@ namespace Bulky.DataAccess.Repository
                     query = query.Include(includeProp);
                 }
             }
-
             return query.FirstOrDefault();
 
         }
