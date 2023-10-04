@@ -2,7 +2,9 @@
 using Bulky.DataAccess.Repository;
 using Bulky.DataAccess.Repository.IRepository;
 using Bulky.Model;
+using Bulky.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -23,6 +25,14 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            if(claim != null)
+            {
+                HttpContext.Session.SetInt32(SD.SessionCart, _UnitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == claim.Value).Count());
+            }
             IEnumerable<Product> ProductList = _UnitOfWork.Product.GetAll(includeProperties: "Category");
             return View(ProductList);
         }
@@ -55,14 +65,18 @@ namespace BulkyWeb.Areas.Customer.Controllers
             if(cartFromDb != null)
             {
                 cartFromDb.Count += shoppingCart.Count;
+
                 _UnitOfWork.ShoppingCart.Update(cartFromDb);
+                _UnitOfWork.Save();
             }
             else
             {
                 _UnitOfWork.ShoppingCart.Add(shoppingCart);
+                _UnitOfWork.Save();
+                HttpContext.Session.SetInt32(SD.SessionCart, _UnitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId).Count());
             }
             
-            _UnitOfWork.Save();
+            
 
             TempData["Success"] = "Card Updated Successfully";
 
