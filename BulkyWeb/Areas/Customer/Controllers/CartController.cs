@@ -150,7 +150,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
             {
                 // if a regular customer, add stripe logic
 
-                var domain = "https://localhost:7049/";
+                var domain = Request.Scheme + "://"+ Request.Host.Value + "/";
                 var options = new SessionCreateOptions
                 {
                     SuccessUrl = domain + $"customer/cart/OrderConfirmation?id={ShoppingCartVM.OrderHeader.Id}",

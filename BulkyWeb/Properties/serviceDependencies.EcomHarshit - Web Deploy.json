@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/EcomHarshit/providers/Microsoft.ServiceLinker/linkers/Servertcpbulkyy.database.windows.net1433_7DB64249C3",
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/bulkyy/databases/bulky",
+      "type": "mssql.azure",
+      "connectionId": "Server=tcp:bulkyy.database.windows.net,1433"
+    }
+  }
+}
